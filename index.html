@@ -232,24 +232,13 @@ function shuffle(arr){
 function cleanQuestionText(s){
   let q=String(s||"").trim();
 
-  // Αφαιρεί παλιές αυτόματες λεζάντες που υπήρχαν σε προηγούμενες εκδόσεις.
-  q=q.replace(/^Ποια απάντηση είναι σωστή εδώ;\s*/i,"");
-  q=q.replace(/^Απάντησε στην ερώτηση:\s*/i,"");
-  q=q.replace(/^Γρήγορος γύρος γνώσεων:\s*/i,"");
-  q=q.replace(/^Πρόκληση γνώσεων:\s*/i,"");
-  q=q.replace(/^Quiz Master:\s*/i,"");
-  q=q.replace(/^Μπορείς να βρεις τη σωστή απάντηση;\s*/i,"");
-  q=q.replace(/^Έλεγξε τις γνώσεις σου:\s*/i,"");
-  q=q.replace(/^Νέα ερώτηση:\s*/i,"");
-  q=q.replace(/^Γύρος γνώσεων\s*[—-]\s*/i,"");
-  q=q.replace(/^Ποια επιλογή θα διάλεγες;\s*/i,"");
-  q=q.replace(/^Bonus ερώτηση:\s*/i,"");
-  q=q.replace(/^Επόμενη πρόκληση:\s*/i,"");
+  // Αφαιρεί όλες τις αυτόματες λεζάντες των παλιών εκδόσεων.
+  q=q.replace(/^(?:Ποια απάντηση είναι σωστή εδώ;|Απάντησε στην ερώτηση:|Γρήγορος γύρος γνώσεων:|Πρόκληση γνώσεων:|Quiz Master:|Μπορείς να βρεις τη σωστή απάντηση;|Έλεγξε τις γνώσεις σου:|Νέα ερώτηση:|Γύρος γνώσεων\s*[—-]|Ποια επιλογή θα διάλεγες;|Bonus ερώτηση:|Επόμενη πρόκληση:)\s*/i,"");
 
-  // Αφαιρεί παλιές σημάνσεις τύπου "• music-18", "music-18" ή "[12]".
-  q=q.replace(/\s*[•·]\s*[a-z]+-\d+\s*$/i,"");
-  q=q.replace(/\s+[a-z]+-\d+\s*$/i,"");
-  q=q.replace(/\s*\[\d+\]\s*$/,"");
+  // Αφαιρεί ΟΛΑ τα tags τύπου general-8 / music-18 / science-3.
+  q=q.replace(/\s*[•·;:]?\s*[a-z]+-\d+\s*$/i,"");
+  q=q.replace(/\s*\[[a-z]+-\d+\]\s*$/i,"");
+  q=q.replace(/\s*\([a-z]+-\d+\)\s*$/i,"");
 
   return q.replace(/\s+/g," ").trim();
 }
@@ -257,8 +246,8 @@ function normalizeQuestion(s){
   return cleanQuestionText(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .replace(/[«»“”"']/g,"").replace(/\s+/g," ").trim();
 }
-function questionKey(q){return normalizeQuestion(q[2])}
-const USED_KEY="quiz_master_used_v6";
+function questionKey(q){return normalizeQuestion(q[2]);}
+const USED_KEY="quiz_master_used_v7_clean";
 function loadUsed(){try{return new Set(JSON.parse(localStorage.getItem(USED_KEY)||"[]"))}catch(e){return new Set()}}
 function saveUsed(set){try{localStorage.setItem(USED_KEY,JSON.stringify([...set]))}catch(e){}}
 
