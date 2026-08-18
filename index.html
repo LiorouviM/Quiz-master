@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quiz Master — Άπειρες Ερωτήσεις</title>
+<title>Quiz Master — Random Questions</title>
 <style>
 :root{--bg:#0b1020;--card:#151c33;--card2:#1c2542;--text:#f5f7ff;--muted:#aab4d0;--accent:#7c5cff;--good:#25c98a;--bad:#ff5c75}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#202b55,#0b1020 55%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -183,211 +183,7 @@ const API_CAT_NAME={
   "Entertainment: Books":"literature","Food & Drink":"food","Animals":"animals"
 };
 
-function buildGeneratedQuestions(){
-  const out=[];
-  const seen=new Set(QUESTIONS.map(q=>q[2].trim().toLowerCase()));
-  const add=(q)=>{
-    const key=q[2].trim().toLowerCase();
-    if(!seen.has(key)){seen.add(key);out.push(q)}
-  };
-  const wrong=(correct, pool, i)=>{
-    const arr=pool.filter(x=>x!==correct);
-    const a=arr[i%arr.length], b=arr[(i+1)%arr.length], c=arr[(i+2)%arr.length];
-    return [correct,a,b,c];
-  };
-
-  // ΓΕΩΓΡΑΦΙΑ
-  const capitals=[
-    ["Γαλλία","Παρίσι"],["Γερμανία","Βερολίνο"],["Ισπανία","Μαδρίτη"],["Πορτογαλία","Λισαβόνα"],
-    ["Αυστρία","Βιέννη"],["Βέλγιο","Βρυξέλλες"],["Ολλανδία","Άμστερνταμ"],["Νορβηγία","Όσλο"],
-    ["Σουηδία","Στοκχόλμη"],["Φινλανδία","Ελσίνκι"],["Δανία","Κοπεγχάγη"],["Ιρλανδία","Δουβλίνο"],
-    ["Πολωνία","Βαρσοβία"],["Τσεχία","Πράγα"],["Ουγγαρία","Βουδαπέστη"],["Ρουμανία","Βουκουρέστι"],
-    ["Βουλγαρία","Σόφια"],["Σερβία","Βελιγράδι"],["Κροατία","Ζάγκρεμπ"],["Σλοβενία","Λιουμπλιάνα"],
-    ["Ελβετία","Βέρνη"],["Καναδάς","Οτάβα"],["ΗΠΑ","Ουάσινγκτον"],["Μεξικό","Πόλη του Μεξικού"],
-    ["Βραζιλία","Μπραζίλια"],["Αργεντινή","Μπουένος Άιρες"],["Χιλή","Σαντιάγο"],["Αυστραλία","Καμπέρα"],
-    ["Νέα Ζηλανδία","Ουέλινγκτον"],["Ιαπωνία","Τόκιο"],["Κίνα","Πεκίνο"],["Νότια Κορέα","Σεούλ"],
-    ["Ινδία","Νέο Δελχί"],["Ταϊλάνδη","Μπανγκόκ"],["Αίγυπτος","Κάιρο"],["Μαρόκο","Ραμπάτ"],
-    ["Κένυα","Ναϊρόμπι"],["Νιγηρία","Αμπούτζα"],["Τουρκία","Άγκυρα"],["Ισραήλ","Ιερουσαλήμ"],
-    ["Ιταλία","Ρώμη"],["Ελλάδα","Αθήνα"],["Κύπρος","Λευκωσία"],["Ηνωμένο Βασίλειο","Λονδίνο"]
-  ];
-  const capPool=capitals.map(x=>x[1]);
-  capitals.forEach(([country,capital],i)=>{
-    const opts=wrong(capital,capPool,i);
-    add(["geography","easy",`Ποια είναι η πρωτεύουσα της ${country};`,...opts]);
-  });
-
-  const continents=[
-    ["Αίγυπτος","Αφρική"],["Βραζιλία","Νότια Αμερική"],["Καναδάς","Βόρεια Αμερική"],["Ιαπωνία","Ασία"],
-    ["Γερμανία","Ευρώπη"],["Αυστραλία","Ωκεανία"],["Αργεντινή","Νότια Αμερική"],["Νορβηγία","Ευρώπη"],
-    ["Ινδία","Ασία"],["Κένυα","Αφρική"],["Χιλή","Νότια Αμερική"],["Μεξικό","Βόρεια Αμερική"],
-    ["Νέα Ζηλανδία","Ωκεανία"],["Ελλάδα","Ευρώπη"],["Μαρόκο","Αφρική"]
-  ];
-  const contPool=["Ευρώπη","Ασία","Αφρική","Βόρεια Αμερική","Νότια Αμερική","Ωκεανία","Ανταρκτική"];
-  continents.forEach(([c,co],i)=>add(["geography","easy",`Σε ποια ήπειρο βρίσκεται η ${c};`,...wrong(co,contPool,i)]));
-  const geoFacts=[
-    ["Ποιος είναι ο μεγαλύτερος ωκεανός της Γης;","Ειρηνικός","Ατλαντικός","Ινδικός","Αρκτικός"],
-    ["Ποιος είναι ο μεγαλύτερος ποταμός της Ευρώπης σε μήκος;","Βόλγας","Δούναβης","Ρήνος","Σηκουάνας"],
-    ["Ποια είναι η μεγαλύτερη χώρα στον κόσμο σε έκταση;","Ρωσία","Καναδάς","Κίνα","ΗΠΑ"],
-    ["Ποια είναι η μεγαλύτερη ήπειρος σε έκταση;","Ασία","Αφρική","Ευρώπη","Βόρεια Αμερική"],
-    ["Ποια είναι η ψηλότερη οροσειρά του κόσμου;","Ιμαλάια","Άλπεις","Άνδεις","Ροκί"],
-    ["Ποια θάλασσα βρίσκεται ανάμεσα στην Ελλάδα και την Τουρκία;","Αιγαίο Πέλαγος","Ιόνιο Πέλαγος","Μαύρη Θάλασσα","Αδριατική"],
-    ["Ποιο είναι το μεγαλύτερο νησί της Ελλάδας;","Κρήτη","Εύβοια","Ρόδος","Λέσβος"]
-  ];
-  geoFacts.forEach(q=>add(["geography","medium",...q]));
-
-  // ΜΑΘΗΜΑΤΙΚΑ - περιορισμένα αλλά πραγματικά διαφορετικά
-  for(let a=2;a<=60;a++){
-    for(let b=2;b<=20;b++){
-      const ans=a*b;
-      add(["math",a%3===0?"medium":"easy",`Πόσο κάνει ${a} × ${b};`,String(ans),String(ans+a),String(ans-b),String(ans+10)]);
-    }
-  }
-  for(let n=10;n<=200;n+=5){
-    const pct=[10,20,25,50][n%4], ans=n*pct/100;
-    add(["math","medium",`Πόσο είναι το ${pct}% του ${n};`,String(ans),String(ans+5),String(ans-5),String(ans+10)]);
-  }
-
-  // ΕΠΙΣΤΗΜΗ
-  const elements=[
-    ["υδρογόνου","H"],["ηλίου","He"],["λιθίου","Li"],["άνθρακα","C"],["αζώτου","N"],["οξυγόνου","O"],
-    ["φθορίου","F"],["νέον","Ne"],["νατρίου","Na"],["μαγνησίου","Mg"],["αλουμινίου","Al"],["πυριτίου","Si"],
-    ["φωσφόρου","P"],["θείου","S"],["χλωρίου","Cl"],["καλίου","K"],["ασβεστίου","Ca"],["σιδήρου","Fe"],
-    ["χαλκού","Cu"],["ψευδαργύρου","Zn"],["αργύρου","Ag"],["χρυσού","Au"]
-  ];
-  const symPool=elements.map(x=>x[1]);
-  elements.forEach(([el,sym],i)=>add(["science","easy",`Ποιο είναι το χημικό σύμβολο του ${el};`,...wrong(sym,symPool,i)]));
-  [
-    ["Ποιο όργανο αντλεί το αίμα στο ανθρώπινο σώμα;","Καρδιά","Ήπαρ","Νεφρά","Πνεύμονες"],
-    ["Ποιο είναι το μεγαλύτερο όργανο του ανθρώπινου σώματος;","Δέρμα","Ήπαρ","Πνεύμονες","Εγκέφαλος"],
-    ["Ποιο αέριο χρειάζονται οι άνθρωποι για την αναπνοή;","Οξυγόνο","Άζωτο","Ήλιο","Υδρογόνο"],
-    ["Ποια δύναμη μας κρατά στην επιφάνεια της Γης;","Βαρύτητα","Τριβή","Μαγνητισμός","Άνωση"],
-    ["Ποιο είναι το σημείο βρασμού του νερού σε κανονική ατμοσφαιρική πίεση;","100 °C","0 °C","50 °C","212 °C"],
-    ["Ποια βιταμίνη συντίθεται στο δέρμα με την επίδραση του ηλιακού φωτός;","Βιταμίνη D","Βιταμίνη C","Βιταμίνη B12","Βιταμίνη K"],
-    ["Ποια είναι η βασική μονάδα της ζωής;","Κύτταρο","Ιστός","Όργανο","Μόριο"]
-  ].forEach(q=>add(["science","medium",...q]));
-
-  // ΔΙΑΣΤΗΜΑ
-  const planets=["Ερμής","Αφροδίτη","Γη","Άρης","Δίας","Κρόνος","Ουρανός","Ποσειδώνας"];
-  planets.forEach((pl,i)=>{
-    add(["space","easy",`Ποια θέση από τον Ήλιο έχει ο πλανήτης ${pl};`,String(i+1),String((i+2-1)%8+1),String((i+3-1)%8+1),String((i+4-1)%8+1)]);
-    add(["space","easy",`Ποιο είναι το φυσικό χαρακτηριστικό που ξεχωρίζει τον ${pl} από τις παρακάτω επιλογές;`,
-      i===5?"Οι δακτύλιοι του":"Έχει χαρακτηριστικά που δεν σχετίζονται με τη συγκεκριμένη επιλογή",
-      i===5?"Έχει ωκεανούς νερού":"Έχει ατμόσφαιρα μόνο από οξυγόνο",
-      "Είναι άστρο"]);
-  });
-  [
-    ["Ποιο είναι το φυσικό δορυφόρο της Γης;","Σελήνη","Φόβος","Τιτάνας","Ευρώπη"],
-    ["Ποιος είναι ο μεγαλύτερος πλανήτης του Ηλιακού Συστήματος;","Δίας","Κρόνος","Γη","Ποσειδώνας"],
-    ["Ποιος πλανήτης είναι γνωστός ως Κόκκινος Πλανήτης;","Άρης","Αφροδίτη","Ερμής","Δίας"],
-    ["Ποιος πλανήτης έχει τους πιο εντυπωσιακούς δακτυλίους;","Κρόνος","Άρης","Ερμής","Αφροδίτη"]
-  ].forEach(q=>add(["space","easy",...q]));
-
-  // ΖΩΑ
-  const animalFacts=[
-    ["Ποιο είναι το μεγαλύτερο χερσαίο ζώο;","Αφρικανικός ελέφαντας","Ιπποπόταμος","Καμηλοπάρδαλη","Ρινόκερος"],
-    ["Ποιο είναι το μεγαλύτερο ζώο που έχει ζήσει στη Γη;","Μπλε φάλαινα","Καρχαρίας φάλαινα","Ελέφαντας","Όρκα"],
-    ["Ποιο ζώο είναι γνωστό για το ασπρόμαυρο σχέδιο του σώματός του;","Ζέβρα","Τίγρη","Πάντα","Λεμούριος"],
-    ["Ποιο θηλαστικό μπορεί να πετάξει πραγματικά;","Νυχτερίδα","Ιπτάμενος σκίουρος","Πιγκουίνος","Άλμπατρος"],
-    ["Ποιο ζώο είναι γνωστό ως «πλοίο της ερήμου»;","Καμήλα","Άλογο","Λάμα","Βούβαλος"],
-    ["Ποιο πουλί δεν μπορεί να πετάξει αλλά είναι εξαιρετικός κολυμβητής;","Πιγκουίνος","Αετός","Γεράκι","Πελαργός"],
-    ["Ποιο ζώο έχει οκτώ πλοκάμια;","Χταπόδι","Καλαμάρι","Αστερίας","Μέδουσα"]
-  ];
-  animalFacts.forEach(q=>add(["animals","easy",...q]));
-
-  // ΙΣΤΟΡΙΑ
-  [
-    ["Ποιος ήταν ο πρώτος αυτοκράτορας της Ρωμαϊκής Αυτοκρατορίας;","Αύγουστος","Νέρων","Τραϊανός","Καλιγούλας"],
-    ["Ποια αρχαία πόλη καταστράφηκε από την έκρηξη του Βεζούβιου το 79 μ.Χ.;","Πομπηία","Σπάρτη","Καρχηδόνα","Τύρος"],
-    ["Ποια μάχη του 480 π.Χ. συνδέεται με τον Λεωνίδα;","Θερμοπύλες","Μαραθώνας","Πλαταιές","Σαλαμίνα"],
-    ["Ποια χρονιά έπεσε η Κωνσταντινούπολη στους Οθωμανούς;","1453","1204","1492","1571"],
-    ["Ποιος ήταν ο πρώτος πρόεδρος των Ηνωμένων Πολιτειών;","Τζορτζ Ουάσινγκτον","Τόμας Τζέφερσον","Αβραάμ Λίνκολν","Τζον Άνταμς"],
-    ["Σε ποια χώρα ξεκίνησε η Αναγέννηση;","Ιταλία","Γαλλία","Ισπανία","Αγγλία"],
-    ["Ποιος αρχαίος πολιτισμός έχτισε τις πυραμίδες της Γκίζας;","Αρχαίοι Αιγύπτιοι","Ρωμαίοι","Πέρσες","Μινωίτες"]
-  ].forEach(q=>add(["history","medium",...q]));
-
-  // ΜΥΘΟΛΟΓΙΑ
-  [
-    ["Ποιος ήταν ο θεός του κεραυνού στην αρχαία ελληνική μυθολογία;","Δίας","Ποσειδώνας","Άρης","Απόλλων"],
-    ["Ποιος ήταν ο θεός της θάλασσας;","Ποσειδώνας","Δίας","Ερμής","Ήφαιστος"],
-    ["Ποια θεά ήταν θεά της σοφίας;","Αθηνά","Άρτεμις","Αφροδίτη","Δήμητρα"],
-    ["Ποιος ήρωας σκότωσε τη Μέδουσα;","Περσέας","Ηρακλής","Θησέας","Ιάσονας"],
-    ["Ποιος ήρωας πραγματοποίησε τους δώδεκα άθλους;","Ηρακλής","Οδυσσέας","Αχιλλέας","Περσέας"],
-    ["Ποιος ήταν ο βασιλιάς της Ιθάκης στην Οδύσσεια;","Οδυσσέας","Αγαμέμνων","Μενέλαος","Πρίαμος"]
-  ].forEach(q=>add(["mythology","easy",...q]));
-
-  // ΑΘΛΗΤΙΣΜΟΣ
-  [
-    ["Πόσοι παίκτες μιας ομάδας ποδοσφαίρου βρίσκονται κανονικά στον αγωνιστικό χώρο στην έναρξη;","11","9","10","12"],
-    ["Πόσοι πόντοι αξίζει ένα τρίποντο στο μπάσκετ;","3","2","1","4"],
-    ["Κάθε πόσα χρόνια διεξάγονται συνήθως οι θερινοί Ολυμπιακοί Αγώνες;","4","2","3","5"],
-    ["Σε ποιο άθλημα χρησιμοποιείται το μπαλάκι του τένις;","Τένις","Πόλο","Χάντμπολ","Βόλεϊ"],
-    ["Πόσα λεπτά διαρκεί κανονικά ένας αγώνας ποδοσφαίρου χωρίς καθυστερήσεις;","90","60","80","120"],
-    ["Ποιο άθλημα περιλαμβάνει το Grand Slam Wimbledon;","Τένις","Γκολφ","Κρίκετ","Ράγκμπι"]
-  ].forEach(q=>add(["sports","easy",...q]));
-
-  // ΜΟΥΣΙΚΗ
-  [
-    ["Ποιος είναι γνωστός ως «Βασιλιάς της Ποπ»;","Michael Jackson","Elvis Presley","Prince","David Bowie"],
-    ["Ποιος συνθέτης έγραψε την Ενάτη Συμφωνία;","Μπετόβεν","Μότσαρτ","Μπαχ","Σοπέν"],
-    ["Πόσες χορδές έχει συνήθως μια κλασική κιθάρα;","6","4","5","8"],
-    ["Ποιο όργανο διαθέτει πλήκτρα και χορδές που κρούονται με σφυράκια;","Πιάνο","Βιολί","Φλάουτο","Τρομπέτα"],
-    ["Ποιος Έλληνας συνθέτης έγραψε το «Ζορμπάς»;","Μίκης Θεοδωράκης","Μάνος Χατζιδάκις","Σταύρος Ξαρχάκος","Μάνος Λοΐζος"]
-  ].forEach(q=>add(["music","easy",...q]));
-
-  // ΚΙΝΗΜΑΤΟΓΡΑΦΟΣ
-  [
-    ["Ποια ταινία κέρδισε το Όσκαρ Καλύτερης Ταινίας το 1998;","Titanic","Gladiator","The Matrix","Saving Private Ryan"],
-    ["Ποιος σκηνοθέτησε την ταινία «Jaws»;","Steven Spielberg","James Cameron","Christopher Nolan","Ridley Scott"],
-    ["Σε ποια ταινία εμφανίζεται ο χαρακτήρας Jack Sparrow;","Pirates of the Caribbean","Indiana Jones","The Mummy","Avatar"],
-    ["Ποια ταινία έχει ως κεντρικό χαρακτήρα τον Neo;","The Matrix","Inception","Interstellar","Terminator 2"],
-    ["Ποιος σκηνοθέτησε την ταινία «Avatar»;","James Cameron","Steven Spielberg","Peter Jackson","George Lucas"]
-  ].forEach(q=>add(["cinema","medium",...q]));
-
-  // ΤΕΧΝΟΛΟΓΙΑ
-  [
-    ["Τι σημαίνουν τα αρχικά CPU;","Central Processing Unit","Computer Personal Unit","Central Program Utility","Core Processing User"],
-    ["Ποια εταιρεία δημιούργησε το λειτουργικό σύστημα Android;","Google","Apple","Microsoft","IBM"],
-    ["Τι σημαίνει WWW;","World Wide Web","World Web Window","Wide World Wire","Web World Wide"],
-    ["Ποια γλώσσα χρησιμοποιείται ευρέως για τη δομή ιστοσελίδων;","HTML","SQL","Python","C++"],
-    ["Ποιο είναι το βασικό σύστημα που χρησιμοποιείται για ονόματα ιστοτόπων στο διαδίκτυο;","DNS","USB","HDMI","RAM"]
-  ].forEach(q=>add(["technology","easy",...q]));
-
-  // ΛΟΓΟΤΕΧΝΙΑ
-  [
-    ["Ποιος έγραψε την «Οδύσσεια»;","Όμηρος","Ηρόδοτος","Σοφοκλής","Πλάτων"],
-    ["Ποιος έγραψε τον «Δον Κιχώτη»;","Μιγκέλ ντε Θερβάντες","Ντάντε","Σαίξπηρ","Βίκτωρ Ουγκό"],
-    ["Ποιος έγραψε το «1984»;","Τζορτζ Όργουελ","Άλντους Χάξλεϊ","Τζ. Ρ. Ρ. Τόλκιν","Έρνεστ Χέμινγουεϊ"],
-    ["Ποιος έγραψε τον «Μικρό Πρίγκιπα»;","Αντουάν ντε Σαιντ-Εξυπερύ","Ιούλιος Βερν","Βίκτωρ Ουγκό","Αλέξανδρος Δουμάς"]
-  ].forEach(q=>add(["literature","easy",...q]));
-
-  // ΦΑΓΗΤΟ
-  [
-    ["Από ποια χώρα προέρχεται παραδοσιακά η πίτσα;","Ιταλία","Ισπανία","Γαλλία","Ελλάδα"],
-    ["Ποιο είναι το βασικό συστατικό του χούμους;","Ρεβίθια","Φακές","Πατάτες","Φασόλια"],
-    ["Ποιο τυρί χρησιμοποιείται παραδοσιακά στη χωριάτικη σαλάτα;","Φέτα","Παρμεζάνα","Μοτσαρέλα","Γκούντα"],
-    ["Ποιο φρούτο χρησιμοποιείται για την παρασκευή κρασιού;","Σταφύλι","Μήλο","Ροδάκινο","Πορτοκάλι"]
-  ].forEach(q=>add(["food","easy",...q]));
-
-  // ΓΛΩΣΣΑ
-  [
-    ["Ποιο είναι το αντίθετο της λέξης «σπάνιος»;","Συχνός","Μικρός","Αργός","Ήσυχος"],
-    ["Ποια από τις παρακάτω λέξεις είναι επίθετο;","Όμορφος","Τρέχω","Σπίτι","Γρήγορα"],
-    ["Ποιο είναι το ουδέτερο άρθρο στον ενικό αριθμό;","το","ο","η","οι"],
-    ["Ποια λέξη είναι συνώνυμη της «χαράς»;","Ευτυχία","Λύπη","Φόβος","Οργή"]
-  ].forEach(q=>add(["language","easy",...q]));
-
-  // ΓΕΝΙΚΕΣ ΓΝΩΣΕΙΣ
-  [
-    ["Ποιο είναι το νόμισμα της Ιαπωνίας;","Γιεν","Γουόν","Δολάριο","Ρούβλι"],
-    ["Πόσες ημέρες έχει ένα δίσεκτο έτος;","366","365","364","367"],
-    ["Ποιο χρώμα προκύπτει από την ανάμειξη μπλε και κίτρινου;","Πράσινο","Μωβ","Πορτοκαλί","Κόκκινο"],
-    ["Ποιο είναι το μεγαλύτερο ζώο της ξηράς;","Αφρικανικός ελέφαντας","Λιοντάρι","Ιπποπόταμος","Καμηλοπάρδαλη"]
-  ].forEach(q=>add(["general","easy",...q]));
-
-  return out;
-}
-
-const GENERATED_QUESTIONS=buildGeneratedQuestions();
+const GENERATED_QUESTIONS=[];
 let ALL_QUESTIONS=QUESTIONS.concat(GENERATED_QUESTIONS,apiQuestions);
 
 function renderPlayers(){
@@ -433,12 +229,36 @@ function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
   return arr;
 }
+function cleanQuestionText(s){
+  let q=String(s||"").trim();
+
+  // Αφαιρεί παλιές αυτόματες λεζάντες που υπήρχαν σε προηγούμενες εκδόσεις.
+  q=q.replace(/^Ποια απάντηση είναι σωστή εδώ;\s*/i,"");
+  q=q.replace(/^Απάντησε στην ερώτηση:\s*/i,"");
+  q=q.replace(/^Γρήγορος γύρος γνώσεων:\s*/i,"");
+  q=q.replace(/^Πρόκληση γνώσεων:\s*/i,"");
+  q=q.replace(/^Quiz Master:\s*/i,"");
+  q=q.replace(/^Μπορείς να βρεις τη σωστή απάντηση;\s*/i,"");
+  q=q.replace(/^Έλεγξε τις γνώσεις σου:\s*/i,"");
+  q=q.replace(/^Νέα ερώτηση:\s*/i,"");
+  q=q.replace(/^Γύρος γνώσεων\s*[—-]\s*/i,"");
+  q=q.replace(/^Ποια επιλογή θα διάλεγες;\s*/i,"");
+  q=q.replace(/^Bonus ερώτηση:\s*/i,"");
+  q=q.replace(/^Επόμενη πρόκληση:\s*/i,"");
+
+  // Αφαιρεί παλιές σημάνσεις τύπου "• music-18", "music-18" ή "[12]".
+  q=q.replace(/\s*[•·]\s*[a-z]+-\d+\s*$/i,"");
+  q=q.replace(/\s+[a-z]+-\d+\s*$/i,"");
+  q=q.replace(/\s*\[\d+\]\s*$/,"");
+
+  return q.replace(/\s+/g," ").trim();
+}
 function normalizeQuestion(s){
-  return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  return cleanQuestionText(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .replace(/[«»“”"']/g,"").replace(/\s+/g," ").trim();
 }
 function questionKey(q){return normalizeQuestion(q[2])}
-const USED_KEY="quiz_master_used_v5";
+const USED_KEY="quiz_master_used_v6";
 function loadUsed(){try{return new Set(JSON.parse(localStorage.getItem(USED_KEY)||"[]"))}catch(e){return new Set()}}
 function saveUsed(set){try{localStorage.setItem(USED_KEY,JSON.stringify([...set]))}catch(e){}}
 
@@ -486,7 +306,7 @@ async function fetchTriviaBatch(cat,diff){
 
   const fresh=[];
   for(const x of j.results){
-    const q=decodeB64Unicode(x.question);
+    const q=cleanQuestionText(decodeB64Unicode(x.question));
     const correct=decodeB64Unicode(x.correct_answer);
     const wrongs=x.incorrect_answers.map(decodeB64Unicode);
     const key=normalizeQuestion(q);
@@ -508,7 +328,13 @@ async function ensureEnoughQuestions(cat,diff,needed){
   ).length;
   if(countFresh()>=needed)return true;
   try{
-    await fetchTriviaBatch(cat,diff);
+    let attempts=0;
+    while(countFresh()<needed && attempts<6){
+      const before=countFresh();
+      const got=await fetchTriviaBatch(cat,diff);
+      attempts++;
+      if(!got.length && countFresh()===before) break;
+    }
     return countFresh()>=needed;
   }catch(e){
     return false;
@@ -532,12 +358,17 @@ async function buildQuestionSet(){
 
   if(fresh.length<needed){
     try{
-      await fetchTriviaBatch(cat,diff);
-      pool=ALL_QUESTIONS.filter(q=>
-        (cat==="all"||q[0]===cat) &&
-        (diff==="mixed"||q[1]===diff)
-      );
-      fresh=pool.filter(q=>!used.has(questionKey(q)));
+      let attempts=0;
+      while(fresh.length<needed && attempts<6){
+        const got=await fetchTriviaBatch(cat,diff);
+        attempts++;
+        if(!got.length) break;
+        pool=ALL_QUESTIONS.filter(q=>
+          (cat==="all"||q[0]===cat) &&
+          (diff==="mixed"||q[1]===diff)
+        );
+        fresh=pool.filter(q=>!used.has(questionKey(q)));
+      }
     }catch(e){}
   }
 
@@ -547,21 +378,30 @@ async function buildQuestionSet(){
   }
 
   function balancedPick(items,amount){
-    if(cat!=="all") return shuffle(items.slice()).slice(0,amount);
+    const randomized=shuffle(items.slice());
+    if(cat!=="all") return randomized.slice(0,amount);
+
     const byCat={};
-    items.forEach(q=>(byCat[q[0]] ||= []).push(q));
-    Object.values(byCat).forEach(arr=>shuffle(arr));
+    randomized.forEach(q=>(byCat[q[0]] ||= []).push(q));
     const cats=shuffle(Object.keys(byCat));
     const picked=[];
+
+    // Round-robin across randomized categories, so "all categories" stays
+    // diverse without creating a predictable sequence.
     while(picked.length<amount){
       let added=false;
-      for(const c of cats){
-        if(picked.length>=amount)break;
-        if(byCat[c]?.length){picked.push(byCat[c].pop());added=true;}
+      for(const c of shuffle(cats.slice())){
+        if(picked.length>=amount) break;
+        const bucket=byCat[c];
+        if(bucket?.length){
+          const idx=Math.floor(Math.random()*bucket.length);
+          picked.push(bucket.splice(idx,1)[0]);
+          added=true;
+        }
       }
-      if(!added)break;
+      if(!added) break;
     }
-    return picked;
+    return shuffle(picked);
   }
 
   const selected=balancedPick(fresh,needed);
@@ -592,7 +432,7 @@ function showQuestion(){
   document.getElementById("turnPlayer").textContent="🎮 "+p.name;
   document.getElementById("round").textContent=`Ερώτηση ${game.qIndex+1}/${game.questionCount}`;
   document.getElementById("bar").style.width=((game.qIndex+1)/game.questionCount*100)+"%";
-  document.getElementById("question").textContent=q[2];
+  document.getElementById("question").textContent=cleanQuestionText(q[2]);
   document.getElementById("feedback").textContent="";
   document.getElementById("feedback").className="feedback";
   document.getElementById("next").classList.add("hidden");
